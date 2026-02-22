@@ -7,8 +7,12 @@ import { Badge, Button, Card, Group, Stack, Text, Title } from "@mantine/core";
 import { useApi } from "@/api/context";
 import { Client } from "@/types/clients";
 
+import ClientNotesSection from "./ClientNotesSection";
+
 export default function ClientDetailPage() {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams();
+  const id = params?.id as string | undefined;
+
   const router = useRouter();
   const api = useApi();
 
@@ -16,13 +20,24 @@ export default function ClientDetailPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!id) return;
+
+    setLoading(true);
+
     api.clients
       .getClient(id)
       .then(setClient)
+      .catch((err) => {
+        console.error("Failed to fetch client", err);
+        setClient(null);
+      })
       .finally(() => setLoading(false));
   }, [api, id]);
 
+  if (!id) return null;
+
   if (loading) return <div>Loading...</div>;
+
   if (!client) return <div>Client not found</div>;
 
   return (
@@ -68,6 +83,9 @@ export default function ClientDetailPage() {
           </Group>
         </Stack>
       </Card>
+
+      {/* ClientNotes Section */}
+      <ClientNotesSection clientId={id} />
     </Stack>
   );
 }
