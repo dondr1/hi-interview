@@ -38,4 +38,13 @@ export default class ClientsApi {
     );
     return response.data;
   };
+
+  public createClient = async (payload: {
+    email: string;
+    first_name: string;
+    last_name: string;
+  }): Promise<Client> => {
+    const response = await this.axiosInstance.post<Client>("client", payload);
+    return response.data;
+  };
 }
